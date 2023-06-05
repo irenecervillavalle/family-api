@@ -10,6 +10,7 @@ from datastructures import FamilyStructure
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+jackson_family = FamilyStructure('Jackson')
 CORS(app)
 
 # create the jackson family object
@@ -31,12 +32,53 @@ def handle_hello():
     # this is how you can use the Family datastructure by calling its methods
     members = jackson_family.get_all_members()
     response_body = {
-        "hello": "world",
         "family": members
     }
 
 
     return jsonify(response_body), 200
+
+
+@app.route('/member/<int:member_id>', methods=['GET'])
+def member_id(member_id):
+    # this is how you can use the Family datastructure by calling its methods
+    member = jackson_family.get_member(member_id)
+
+    if not member:
+        return jsonify({"message" : "Not found member by id"}),404
+
+    response_body = {
+        "member" : member
+    }
+
+
+    return jsonify(response_body), 200    
+
+@app.route('/member/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+    # this is how you can use the Family datastructure by calling its methods
+    member = jackson_family.delete_member(member_id)
+    if not member:
+        return jsonify({"message" : "Not found member by id"}), 404
+
+    response_body = {
+        "message" : "Delete member"
+    }
+
+
+    return jsonify(response_body), 200       
+
+@app.route('/member', methods=['POST'])
+def add_member():
+    new_member = request.get_json()
+    member = jackson_family.add_member(new_member)
+
+    response_body = {
+        "message" : "Add success correct member"
+    }
+
+
+    return jsonify(response_body), 200    
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
